@@ -1,5 +1,6 @@
 module Inputs where
 
+import Debug
 import Model ( Action ( Step ), Stepper )
 import Graphics.Input ( Input, input )
 import Graphics.Input.Field as Field
@@ -24,12 +25,9 @@ loginUsernameInput = input Field.noContent
 loginUsernameAction : Field.Content -> Stepper
 loginUsernameAction content appState =
     let login = appState.login in
-    { appState | login <- { login | username <- content } }
+    { appState | login <- { login | username <- Debug.watch "username"  content } }
 
 -- Password
-
-loginPassword : Signal Action
-loginPassword = Step <~ (loginPasswordAction <~ loginPasswordInput.signal)
 
 loginPasswordInput : Input Field.Content
 loginPasswordInput = input Field.noContent
@@ -37,4 +35,4 @@ loginPasswordInput = input Field.noContent
 loginPasswordAction : Field.Content -> Stepper
 loginPasswordAction content appState =
     let login = appState.login in
-    { appState | login <- { login | password <- content } }
+    { appState | login <- { login | password <- Debug.watch "password" content } }
