@@ -11,7 +11,7 @@ import Model ( AppState, View )
 import Login
 
 render : View
-render state (w,h) =
+render state dim =
   let pos = midTopAt (relative 0.5) (absolute 40) in
-  flow down [ Login.render state (w,h)
+  flow down [ Login.render state dim
             ]

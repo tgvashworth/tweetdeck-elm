@@ -1,6 +1,7 @@
 module Model where
 
 import Graphics.Input.Field as Field
+import Graphics.Input as Input
 
 --- USER
 
@@ -75,6 +76,11 @@ type Stepper = AppState -> AppState
 data Action
   = NoOp
   | Step Stepper
+
+type IA a =
+  { input  : Input.Input a
+  , action : a -> Stepper
+  }
 
 --- VIEW
 
