@@ -18,10 +18,6 @@ render state (w,h) =
 loginForm : View
 loginForm state (w,h) =
   let pos = midTopAt (relative 0.5) (absolute 40) in
-  container w h pos <| flow down [ header
+  container w h pos <| flow down [ leftAligned << Text.color (rgb 0 0 0) << Text.height 16 <| toText "Login"
                                  , field defaultStyle loginUsernameInput.handle identity "Phone, email or username" state.login.username
                                  , password defaultStyle loginPasswordInput.handle identity "Password" state.login.password ]
-
-header : Element
-header =
-    leftAligned << Text.color (rgb 0 0 0) << Text.height 16 <| toText "Login"
