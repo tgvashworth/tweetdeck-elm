@@ -1,7 +1,7 @@
 module Login where
 
 import Debug
-import Graphics.Input (Input, input)
+import Graphics.Input (Input, input, button)
 import Graphics.Input.Field (..)
 import Text as Text
 
@@ -20,4 +20,6 @@ loginForm state (w,h) =
   let pos = midTopAt (relative 0.5) (absolute 40) in
   container w h pos <| flow down [ leftAligned << Text.color (rgb 0 0 0) << Text.height 16 <| toText "Login"
                                  , field defaultStyle loginInputs.username.input.handle identity "Phone, email or username" state.login.username
-                                 , password defaultStyle loginInputs.password.input.handle identity "Password" state.login.password ]
+                                 , password defaultStyle loginInputs.password.input.handle identity "Password" state.login.password
+                                 , button loginInputs.button.input.handle () "Login"
+                                 ]

@@ -1,7 +1,7 @@
 module Inputs where
 
 import Debug
-import Model ( IA, Action ( Step ), Stepper )
+import Model ( InputAction, InputStepper, Action ( Step, Login ), Stepper )
 import Graphics.Input ( Input, input )
 import Graphics.Input.Field as Field
 
@@ -9,17 +9,20 @@ import Graphics.Input.Field as Field
 
 inputs : [Signal Action]
 inputs =
+  [ (loginInputs.button.action <~ loginInputs.button.input.signal) ]
+  ++
   map makeStep
-    [ (loginInputs.username.action <~ loginInputs.username.input.signal)
-    , (loginInputs.password.action <~ loginInputs.password.input.signal)
-    ]
+      [ (loginInputs.username.action <~ loginInputs.username.input.signal)
+      , (loginInputs.password.action <~ loginInputs.password.input.signal)
+      ]
 
 makeStep : Signal Stepper -> Signal Action
 makeStep = lift Step
 
 type LoginInputs =
-  { username : IA Field.Content
-  , password : IA Field.Content
+  { username : InputStepper Field.Content
+  , password : InputStepper Field.Content
+  , button   : InputAction ()
   }
 
 loginInputs : LoginInputs
@@ -31,6 +34,10 @@ loginInputs =
   , password =
     { input  = input Field.noContent
     , action = loginPasswordAction
+    }
+  , button =
+    { input  = input ()
+    , action = (always Login)
     }
   }
 

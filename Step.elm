@@ -1,10 +1,11 @@
 module Step (step) where
 
-import Model ( AppState, Action (NoOp, Step) )
+import Model ( AppState, Action (NoOp, Step), temporaryFakeAuthedUserState )
 import Debug
 
 step : Action -> AppState -> AppState
-step action state =
+step action appState =
   case Debug.watch "currentAction" action of
-    NoOp -> state
-    Step a -> a state
+    NoOp   -> appState
+    Login  -> { appState | user <- Just temporaryFakeAuthedUserState }
+    Step f -> f appState

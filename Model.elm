@@ -9,9 +9,9 @@ type UserId     = String
 type ScreenName = String
 
 type User =
-  { id         : UserId
-  , screenanme : ScreenName
-  , name       : String
+  { id        : UserId
+  , screename : ScreenName
+  , name      : String
   }
 
 type Tokens = (String, String)
@@ -19,6 +19,16 @@ type Tokens = (String, String)
 type AuthedUser =
   { user   : User
   , tokens : Tokens
+  }
+
+initialUserState = Nothing
+
+temporaryFakeAuthedUserState =
+  { user   = { id        = "12345"
+             , screename = "tom"
+             , name      = "Tom"
+             }
+  , tokens = ("12345-abc123xyz456","aioah3r989q3xy88x3")
   }
 
 --- COLUMN
@@ -30,6 +40,8 @@ type Chirp =
 type ColumnState =
   { chirps : [Chirp]
   }
+
+initialColumnsState = []
 
 --- COMPOSE
 
@@ -63,8 +75,8 @@ type AppState =
   }
 
 initialAppState =
-  { user    = Nothing
-  , columns = []
+  { user    = initialUserState
+  , columns = initialColumnsState
   , compose = initialComposeState
   , login   = initialLoginState
   }
@@ -75,11 +87,17 @@ type Stepper = AppState -> AppState
 
 data Action
   = NoOp
+  | Login
   | Step Stepper
 
-type IA a =
+type InputStepper a =
   { input  : Input.Input a
   , action : a -> Stepper
+  }
+
+type InputAction a =
+  { input  : Input.Input a
+  , action : a -> Action
   }
 
 --- VIEW
