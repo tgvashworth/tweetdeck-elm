@@ -46,11 +46,11 @@ loginInputs =
 loginUsernameAction : Field.Content -> Stepper
 loginUsernameAction content appState =
   let login = appState.login in
-  { appState | login <- { login | username <- Debug.watch "username"  content } }
+  { appState | login <- { login | username <- content } }
 
 -- Password
 
 loginPasswordAction : Field.Content -> Stepper
 loginPasswordAction content appState =
   let login = appState.login in
-  { appState | login <- { login | password <- Debug.watch "password" content } }
+  { appState | login <- { login | password <- content } }
