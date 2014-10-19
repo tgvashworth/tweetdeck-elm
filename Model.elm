@@ -3,6 +3,24 @@ module Model where
 import Graphics.Input.Field as Field
 import Graphics.Input as Input
 
+--- STATE
+
+type AppState =
+  { user    : Maybe AuthedUser
+  , columns : [ColumnState]
+  , compose : ComposeState
+  , login   : LoginState
+  , working : Bool
+  }
+
+initialAppState =
+  { user    = initialUserState
+  , columns = initialColumnsState
+  , compose = initialComposeState
+  , login   = initialLoginState
+  , working = False
+  }
+
 --- USER
 
 type UserId     = String
@@ -63,22 +81,6 @@ type LoginState =
 initialLoginState =
   { username = Field.noContent
   , password = Field.noContent
-  }
-
---- STATE
-
-type AppState =
-  { user    : Maybe AuthedUser
-  , columns : [ColumnState]
-  , compose : ComposeState
-  , login   : LoginState
-  }
-
-initialAppState =
-  { user    = initialUserState
-  , columns = initialColumnsState
-  , compose = initialComposeState
-  , login   = initialLoginState
   }
 
 --- ACTIONS
