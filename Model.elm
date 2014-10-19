@@ -83,6 +83,11 @@ initialLoginState =
   , password = Field.noContent
   }
 
+type LoginData =
+  { username : String
+  , password : String
+  }
+
 --- ACTIONS
 
 type Stepper = AppState -> AppState
@@ -95,11 +100,6 @@ data Action
 type InputStepper a =
   { input  : Input.Input a
   , action : a -> Stepper
-  }
-
-type InputAction a =
-  { input  : Input.Input a
-  , action : a -> Action
   }
 
 --- VIEW

@@ -1,45 +1,68 @@
 module Inputs where
 
 import Debug
-import Model ( InputAction, InputStepper, Action ( Step, Login ), Stepper )
+import Http
 import Graphics.Input ( Input, input )
 import Graphics.Input.Field as Field
+
+import Model ( .. )
 
 {- How do I abstract these? -}
 
 inputs : [Signal Action]
 inputs =
-  [ (loginInputs.button.action <~ loginInputs.button.input.signal) ]
+  [ loginUser (dropRepeats loginData) ]
   ++
   map makeStep
-      [ (loginInputs.username.action <~ loginInputs.username.input.signal)
-      , (loginInputs.password.action <~ loginInputs.password.input.signal)
+      [ (loginUsernameAction <~ loginInputs.username.signal)
+      , (loginPasswordAction <~ loginInputs.password.signal)
       ]
 
 makeStep : Signal Stepper -> Signal Action
 makeStep = lift Step
 
+--- LOGIN
+
 type LoginInputs =
-  { username : InputStepper Field.Content
-  , password : InputStepper Field.Content
-  , button   : InputAction ()
+  { username : Input Field.Content
+  , password : Input Field.Content
+  , action   : Input LoginState
   }
 
 loginInputs : LoginInputs
 loginInputs =
-  { username =
-    { input  = input Field.noContent
-    , action = loginUsernameAction
-    }
-  , password =
-    { input  = input Field.noContent
-    , action = loginPasswordAction
-    }
-  , button =
-    { input  = input ()
-    , action = (always Login)
-    }
+  { username = input Field.noContent
+  , password = input Field.noContent
+  , action   = input initialLoginState
   }
+
+loginData : Signal LoginData
+loginData =
+  (\{ username, password } -> { username = username.string
+                              , password = password.string
+                              }) <~ loginInputs.action.signal
+
+loginUser : Signal LoginData -> Signal Action
+loginUser loginData =
+  makeLoginAction <~ Http.send (makeLoginRequest <~ loginData)
+
+makeLoginRequest : LoginData -> Http.Request String
+makeLoginRequest loginData =
+  let authHeader = Debug.watch "basicAuthHeader" (basicAuthHeader loginData)
+  in Http.request "get" "http://localhost:9876/login" "" [ ("Authorization", authHeader)
+                                                         , ("X-TD-Authtype", "twitter")
+                                                         ]
+
+makeLoginAction : Http.Response String -> Action
+makeLoginAction response =
+  let res = Debug.watch "response" response
+  in
+  Step (\state -> { state | working <- False
+                          , user <- Just temporaryFakeAuthedUserState })
+
+basicAuthHeader : LoginData -> String
+basicAuthHeader { username, password } =
+  "x-td-basic " ++ username ++ ":" ++ password
 
 -- Username
 
@@ -54,3 +77,4 @@ loginPasswordAction : Field.Content -> Stepper
 loginPasswordAction content appState =
   let login = appState.login in
   { appState | login <- { login | password <- content } }
+

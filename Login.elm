@@ -19,7 +19,7 @@ loginForm : View
 loginForm state (w,h) =
   let pos = midTopAt (relative 0.5) (absolute 40) in
   container w h pos <| flow down [ leftAligned << Text.color (rgb 0 0 0) << Text.height 16 <| toText "Login"
-                                 , field defaultStyle loginInputs.username.input.handle identity "Phone, email or username" state.login.username
-                                 , password defaultStyle loginInputs.password.input.handle identity "Password" state.login.password
-                                 , button loginInputs.button.input.handle () "Login"
+                                 , field defaultStyle loginInputs.username.handle identity "Phone, email or username" state.login.username
+                                 , password defaultStyle loginInputs.password.handle identity "Password" state.login.password
+                                 , button loginInputs.action.handle state.login "Login"
                                  ]
