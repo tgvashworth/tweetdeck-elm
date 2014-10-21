@@ -16,4 +16,5 @@ appState : Signal AppState
 appState = foldp step initialAppState actions
 
 main : Signal Element
-main = render <~ appState ~ Window.dimensions
+main = render <~ appState
+               ~ Window.dimensions

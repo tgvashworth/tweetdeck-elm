@@ -83,10 +83,7 @@ initialLoginState =
   , password = Field.noContent
   }
 
-type LoginData =
-  { username : String
-  , password : String
-  }
+type LoginData = (String, String)
 
 --- ACTIONS
 

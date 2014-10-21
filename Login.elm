@@ -21,5 +21,5 @@ loginForm state (w,h) =
   container w h pos <| flow down [ leftAligned << Text.color (rgb 0 0 0) << Text.height 16 <| toText "Login"
                                  , field defaultStyle loginInputs.username.handle identity "Phone, email or username" state.login.username
                                  , password defaultStyle loginInputs.password.handle identity "Password" state.login.password
-                                 , button loginInputs.action.handle state.login "Login"
+                                 , button loginInputs.action.handle () "Login"
                                  ]
