@@ -11,11 +11,11 @@ import Model ( .. )
 
 inputs : [Signal Action]
 inputs =
-  [ loginUser (dropRepeats loginData) ]
+  [ wireLogin loginData ]
   ++
   map makeStep
-      [ (loginUsernameAction <~ loginInputs.username.signal)
-      , (loginPasswordAction <~ loginInputs.password.signal)
+      [ loginUsernameAction <~ loginInputs.username.signal
+      , loginPasswordAction <~ loginInputs.password.signal
       ]
 
 makeStep : Signal Stepper -> Signal Action
@@ -46,34 +46,39 @@ loginDataSignals =
 
 loginData : Signal LoginData
 loginData =
-  let siUsername = loginDataSignals.username
-      siPassword = loginDataSignals.password
+  let siUsername  = loginDataSignals.username
+      siPassword  = loginDataSignals.password
       siLoginData = (sampleOn loginInputs.action.signal (pair <~ siUsername ~ siPassword))
-  in (Debug.watch "loginData") <~ siLoginData
+  in (Debug.log "loginData") <~ siLoginData
 
 
 {- The important one! -}
-loginUser : Signal LoginData -> Signal Action
-loginUser loginData =
-  makeLoginAction <~ Http.send (makeLoginRequest <~ loginData)
+wireLogin : Signal LoginData -> Signal Action
+wireLogin loginData =
+  loginAction <~ Http.send (makeLoginRequest <~ loginData)
 
 makeLoginRequest : LoginData -> Http.Request String
 makeLoginRequest loginData =
   case loginData of
     ("", _) -> Http.get ""
     (_, "") -> Http.get ""
-    _ -> let authHeader = Debug.watch "basicAuthHeader" (basicAuthHeader loginData) in
-         Http.request "get" "http://localhost:9876/login" "" [ ("Authorization", authHeader)
-                                                             , ("X-TD-Authtype", "twitter")
-                                                             ]
+    _       -> let authHeader = Debug.watch "basicAuthHeader" (basicAuthHeader loginData) in
+               Http.request "get" "http://localhost:9876/login" "" [ ("Authorization", authHeader)
+                                                                   , ("X-TD-Authtype", "twitter")
+                                                                   ]
 
-makeLoginAction : Http.Response String -> Action
-makeLoginAction response =
+loginAction : Http.Response String -> Action
+loginAction response =
   let res = Debug.watch "response" response in
   case response of
     Http.Success str -> Step (\state -> { state | working <- False
-                                                , user <- Just temporaryFakeAuthedUserState })
-    _ -> NoOp
+                                                , user    <- Nothing })
+
+    Http.Waiting     -> Step (\state -> { state | working <- True })
+
+    Http.Failure _ _ -> Step (\state -> { state | working <- False })
+
+    _                -> NoOp
 
 basicAuthHeader : LoginData -> String
 basicAuthHeader (username, password) =
