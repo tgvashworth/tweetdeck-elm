@@ -62,14 +62,14 @@ makeLoginRequest loginData =
   case loginData of
     ("", _) -> Http.get ""
     (_, "") -> Http.get ""
-    _       -> let authHeader = Debug.watch "basicAuthHeader" (basicAuthHeader loginData) in
+    _       -> let authHeader = Debug.log "basicAuthHeader" (basicAuthHeader loginData) in
                Http.request "get" "http://localhost:9876/login" "" [ ("Authorization", authHeader)
                                                                    , ("X-TD-Authtype", "twitter")
                                                                    ]
 
 loginAction : Http.Response String -> Action
 loginAction response =
-  let res = Debug.watch "response" response in
+  let res = Debug.log "response" response in
   case response of
     Http.Success str -> Step (\state -> { state | working <- False
                                                 , user    <- Nothing })

@@ -7,7 +7,7 @@ import Model ( AppState, Action ( .. ) )
 
 step : Action -> AppState -> AppState
 step action appState =
-  case Debug.watch "currentAction" action of
+  case Debug.log "currentAction" action of
     NoOp   -> appState
 
     Login -> { appState | working <- True }
