@@ -5,6 +5,8 @@ import Http
 import Graphics.Input ( Input, input )
 import Graphics.Input.Field as Field
 
+import Native.Encode
+
 import Model ( .. )
 
 {- How do I abstract these? -}
@@ -46,8 +48,8 @@ loginDataSignals =
 
 loginData : Signal LoginData
 loginData =
-  let siUsername  = loginDataSignals.username
-      siPassword  = loginDataSignals.password
+  let siUsername  = Native.Encode.base64 <~ loginDataSignals.username
+      siPassword  = Native.Encode.base64 <~ loginDataSignals.password
       siLoginData = (sampleOn loginInputs.action.signal (pair <~ siUsername ~ siPassword))
   in (Debug.log "loginData") <~ siLoginData
 
@@ -63,7 +65,7 @@ makeLoginRequest loginData =
     ("", _) -> Http.get ""
     (_, "") -> Http.get ""
     _       -> let authHeader = Debug.log "basicAuthHeader" (basicAuthHeader loginData) in
-               Http.request "get" "http://localhost:9876/login" "" [ ("Authorization", authHeader)
+               Http.request "get" "http://localhost:9875/login" "" [ ("Authorization", authHeader)
                                                                    , ("X-TD-Authtype", "twitter")
                                                                    ]
 
