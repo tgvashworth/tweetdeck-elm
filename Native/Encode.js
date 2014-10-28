@@ -6,6 +6,9 @@ Elm.Native.Encode.make = function(elm) {
     if (elm.Native.Encode.values) return elm.Native.Encode.values;
 
     return elm.Native.Encode.values = {
-        base64: btoa
+        base64Encode: function (x) {
+            // Needs wrapping to avoid "Illegal invocation" errors
+            return btoa(x);
+        }
     };
 };

@@ -5,7 +5,7 @@ import Http
 import Graphics.Input ( Input, input )
 import Graphics.Input.Field as Field
 
-import Native.Encode
+import Encode ( base64Encode )
 
 import Model ( .. )
 
@@ -48,8 +48,8 @@ loginDataSignals =
 
 loginData : Signal LoginData
 loginData =
-  let siUsername  = Native.Encode.base64 <~ loginDataSignals.username
-      siPassword  = Native.Encode.base64 <~ loginDataSignals.password
+  let siUsername  = loginDataSignals.username
+      siPassword  = loginDataSignals.password
       siLoginData = (sampleOn loginInputs.action.signal (pair <~ siUsername ~ siPassword))
   in (Debug.log "loginData") <~ siLoginData
 
@@ -84,7 +84,7 @@ loginAction response =
 
 basicAuthHeader : LoginData -> String
 basicAuthHeader (username, password) =
-  "x-td-basic " ++ username ++ ":" ++ password
+  "x-td-basic " ++ (base64Encode <| username ++ ":" ++ password)
 
 -- Username
 
