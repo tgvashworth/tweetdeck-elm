@@ -3,7 +3,9 @@
 An experiment with Elm.
 
 ```bash
-elm -om --bundle-runtime TweetDeck.elm
+elm -om TweetDeck.elm
 ```
+
+Open `index.html`.
 
 MIT License
