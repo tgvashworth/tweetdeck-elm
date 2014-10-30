@@ -29,25 +29,20 @@ type ScreenName = String
 type User =
   { id        : UserId
   , screename : ScreenName
-  , name      : String
   }
 
-type Tokens = (String, String)
+type Session = String
 
 type AuthedUser =
-  { user   : User
-  , tokens : Tokens
+  { user    : User
+  , session : String
   }
 
 initialUserState = Nothing
 
-temporaryFakeAuthedUserState =
-  { user   = { id        = "12345"
-             , screename = "tom"
-             , name      = "Tom"
-             }
-  , tokens = ("12345-abc123xyz456","aioah3r989q3xy88x3")
-  }
+makeUser : String -> String -> String -> AuthedUser
+makeUser id screename session =
+  { user = { id = id, screename = screename }, session = session }
 
 --- COLUMN
 
@@ -91,6 +86,7 @@ type Stepper = AppState -> AppState
 
 data Action
   = NoOp
+  | Working Bool
   | Login
   | Step Stepper
 

@@ -1,15 +1,16 @@
 module Inputs where
 
 import Debug
+import Dict
 import Http
 import Graphics.Input ( Input, input )
 import Graphics.Input.Field as Field
+import JavaScript.Experimental as JS
+import Json
 
 import Encode ( base64Encode )
 
 import Model ( .. )
-
-{- How do I abstract these? -}
 
 inputs : [Signal Action]
 inputs =
@@ -71,16 +72,37 @@ makeLoginRequest loginData =
 
 loginAction : Http.Response String -> Action
 loginAction response =
-  let res = Debug.log "response" response in
-  case response of
-    Http.Success str -> Step (\state -> { state | working <- False
-                                                , user    <- Nothing })
-
-    Http.Waiting     -> Step (\state -> { state | working <- True })
-
-    Http.Failure _ _ -> Step (\state -> { state | working <- False })
-
+  let _ = Debug.log "response" response
+  in case response of
+    Http.Success str -> loginUser (Json.fromString str)
+    Http.Waiting     -> Working True
+    Http.Failure _ _ -> Working False
     _                -> NoOp
+
+loginUser : Maybe Json.Value -> Action
+loginUser userData =
+  let _ = Debug.log "userData" userData
+  in case userData of
+    Just (Json.Object userObject) ->
+      let authedUser = (makeAuthedUser userObject)
+      in case authedUser of
+        Just user -> Step (\state -> { state | working <- False
+                                             , user    <- Just user })
+        Nothing   -> Working False
+    _ -> Working False
+
+makeAuthedUser : Dict.Dict String Json.Value -> Maybe AuthedUser
+makeAuthedUser userObject =
+  let ud = (,,) (Dict.get "user_id" userObject)
+                (Dict.get "screen_name" userObject)
+                (Dict.get "session" userObject)
+      _  = Debug.log "ud" ud
+  in case ud of
+    (Just (Json.String id), Just (Json.String screenname), Just (Json.String session)) ->
+      let authedUser = makeUser id screenname session
+          _ = Debug.log "authedUser" authedUser
+      in (Just authedUser)
+    _ -> Nothing
 
 basicAuthHeader : LoginData -> String
 basicAuthHeader (username, password) =

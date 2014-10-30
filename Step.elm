@@ -8,8 +8,6 @@ import Model ( AppState, Action ( .. ) )
 step : Action -> AppState -> AppState
 step action appState =
   case Debug.log "currentAction" action of
-    NoOp   -> appState
-
-    Login -> { appState | working <- True }
-
-    Step f -> f appState
+    NoOp      -> appState
+    Working b -> { appState | working <- b }
+    Step f    -> f appState
