@@ -1,14 +1,7 @@
 module Input.Login where
 
-import Debug
-import Dict
-import Http
 import Graphics.Input ( Input, input )
 import Graphics.Input.Field as Field
-import JavaScript.Experimental as JS
-import Json
-
-import Encode ( base64Encode )
 
 import Model ( .. )
 import Api.Login

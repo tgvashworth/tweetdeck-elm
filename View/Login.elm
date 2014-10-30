@@ -1,12 +1,10 @@
 module View.Login where
 
-import Debug
 import Graphics.Input (Input, input, button)
 import Graphics.Input.Field (..)
 import Text as Text
 
-import Model ( AppState, View )
-import Actions ( actions )
+import Model ( View )
 import Input.Login ( loginFormInputs )
 
 render : View

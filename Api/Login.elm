@@ -1,14 +1,10 @@
 module Api.Login where
 
-import Debug
 import Dict
 import Http
-import Graphics.Input ( Input, input )
-import Graphics.Input.Field as Field
-import JavaScript.Experimental as JS
 import Json
 
-import Encode ( base64Encode )
+import Util.Encode
 
 import Model ( .. )
 
@@ -23,7 +19,7 @@ makeLoginRequest loginData =
   case loginData of
     ("", _) -> Http.get ""
     (_, "") -> Http.get ""
-    _       -> let authHeader = Debug.log "basicAuthHeader" (basicAuthHeader loginData) in
+    _       -> let authHeader = basicAuthHeader loginData in
                Http.request "get" "http://localhost:9875/login" "" [ ("Authorization", authHeader)
                                                                    , ("X-TD-Authtype", "twitter")
                                                                    ]
@@ -57,4 +53,4 @@ makeAuthedUser userObject =
 
 basicAuthHeader : LoginData -> String
 basicAuthHeader (username, password) =
-  "x-td-basic " ++ (base64Encode <| username ++ ":" ++ password)
+  "x-td-basic " ++ (Util.Encode.base64Encode <| username ++ ":" ++ password)

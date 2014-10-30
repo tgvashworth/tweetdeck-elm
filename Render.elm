@@ -13,7 +13,7 @@ import View.Login
 
 cText = (rgb 42 47 51)
 
-spinner = image 16 16 "loading-bubbles.svg"
+spinner = image 16 16 "assets/loading-bubbles.svg"
 
 render : Model.View
 render state dim =

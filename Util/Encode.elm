@@ -1,4 +1,4 @@
-module Encode where
+module Util.Encode where
 
 import Native.Encode
 
