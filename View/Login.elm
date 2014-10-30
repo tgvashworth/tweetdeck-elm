@@ -1,4 +1,4 @@
-module Login where
+module View.Login where
 
 import Debug
 import Graphics.Input (Input, input, button)
@@ -7,7 +7,7 @@ import Text as Text
 
 import Model ( AppState, View )
 import Actions ( actions )
-import Inputs ( loginInputs )
+import Input.Login ( loginFormInputs )
 
 render : View
 render state dim =
@@ -19,7 +19,7 @@ loginForm : View
 loginForm state (w,h) =
   let pos = midTopAt (relative 0.5) (absolute 40) in
   container w h pos <| flow down [ leftAligned << Text.color (rgb 0 0 0) << Text.height 16 <| toText "Login"
-                                 , field defaultStyle loginInputs.username.handle identity "Phone, email or username" state.login.username
-                                 , password defaultStyle loginInputs.password.handle identity "Password" state.login.password
-                                 , button loginInputs.action.handle () "Login"
+                                 , field defaultStyle loginFormInputs.username.handle identity "Phone, email or username" state.login.username
+                                 , password defaultStyle loginFormInputs.password.handle identity "Password" state.login.password
+                                 , button loginFormInputs.action.handle () "Login"
                                  ]

@@ -95,6 +95,9 @@ type InputStepper a =
   , action : a -> Stepper
   }
 
+makeStep : Signal Stepper -> Signal Action
+makeStep = lift Step
+
 --- VIEW
 
 type View = AppState -> (Int,Int) -> Element
