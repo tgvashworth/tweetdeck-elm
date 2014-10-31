@@ -30,7 +30,6 @@ loginAction response =
     Http.Success str -> loginUser (Json.fromString str)
     Http.Waiting     -> Working True
     Http.Failure _ _ -> Working False
-    _                -> NoOp
 
 loginUser : Maybe Json.Value -> Action
 loginUser userData =

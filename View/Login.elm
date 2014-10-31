@@ -6,23 +6,24 @@ import Text
 import Dict
 
 import Model
+import Interface as I
 import Input.Login ( loginFormInputs )
 
-textify : String -> Element
-textify str = leftAligned <| Model.fBase str
-
 render : Model.View
-render state dim =
-  case state.user of
-        Nothing -> loginForm state dim
+render appState dim =
+  case appState.user of
+        Nothing -> loginForm appState dim
         Just user -> empty
 
 loginForm : Model.View
-loginForm state (w,h) =
+loginForm appState (w,h) =
   let pos = midTopAt (relative 0.5) (absolute 40) in
   container w h pos
-    <| flow down [ textify "Login"
-                 , field defaultStyle loginFormInputs.username.handle identity "Phone, email or username" state.login.username
-                 , password defaultStyle loginFormInputs.password.handle identity "Password" state.login.password
-                 , button loginFormInputs.action.handle () "Login"
-                 ]
+    <| flow down
+      (intersperse
+        (spacer 5 5)
+        [ leftAligned (I.style I.sTitle "Login")
+        , field defaultStyle loginFormInputs.username.handle identity "Phone, email or username" appState.login.username
+        , password defaultStyle loginFormInputs.password.handle identity "Password" appState.login.password
+        , button loginFormInputs.action.handle () "Login"
+        ])

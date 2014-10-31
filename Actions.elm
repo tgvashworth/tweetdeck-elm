@@ -1,9 +1,9 @@
-module Inputs where
+module Actions where
 
 import Model ( .. )
 import Input.Login
 
-inputs : Signal Action
-inputs =
+actions : Signal Action
+actions =
   merges Input.Login.inputs
 

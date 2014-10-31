@@ -3,7 +3,6 @@ module Model where
 import Graphics.Input.Field as Field
 import Graphics.Input as Input
 import Dict
-import Text
 
 --- STATE
 
@@ -103,14 +102,6 @@ makeStep = lift Step
 --- VIEW
 
 type View = AppState -> (Int,Int) -> Element
-
--- Fonts
-
-fBase = (Text.color cText << Text.height 16 << toText)
-
--- Colors
-
-cText = (rgb 42 47 51)
 
 -- Assets
 
