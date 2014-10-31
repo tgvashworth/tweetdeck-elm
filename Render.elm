@@ -11,22 +11,17 @@ import Html.Optimize.RefEq as Ref
 import Model
 import View.Login
 
-cText = (rgb 42 47 51)
-
-spinner = image 16 16 "assets/loading-bubbles.svg"
 
 render : Model.View
-render state dim =
+render appState dim =
   let pos = midTopAt (relative 0.5) (absolute 40)
-      appState = Debug.watch "appState" state
-  in
-  flow down [ infoBar state dim
-            , View.Login.render state dim
-            ]
+  in flow down [ infoBar appState dim
+               , View.Login.render appState dim
+               ]
 
 infoBar : Model.View
-infoBar state (w,h) =
-  color cText <|
+infoBar appState (w,h) =
+  color Model.cText <|
     container w 16 topLeft <|
       flow right [ spacer 8 16
-                 , if state.working then spinner else empty ]
+                 , if appState.working then Model.spinner else empty ]
