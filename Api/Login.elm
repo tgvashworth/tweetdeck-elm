@@ -8,11 +8,27 @@ import Util.Encode
 
 import Model ( .. )
 
+data LoginResponse
+  = Waiting
+  | Failure Int String
+  | Success (Maybe AuthedUser)
+
 -- Login API Request
 
 doLogin : Signal LoginData -> Signal Action
 doLogin loginData =
-  loginAction <~ Http.send (makeLoginRequest <~ loginData)
+  makeLoginAction <~ (processLoginRepsonse <~ Http.send (makeLoginRequest <~ loginData))
+
+makeLoginAction : LoginResponse -> Action
+makeLoginAction res =
+  case res of
+    (Success (Just user)) ->
+      Step (\state -> { state | working <- False
+                              , user    <- Just user })
+    Waiting ->
+      Working True
+    _ ->
+      Working False
 
 makeLoginRequest : LoginData -> Http.Request String
 makeLoginRequest loginData =
@@ -24,22 +40,23 @@ makeLoginRequest loginData =
                                                                    , ("X-TD-Authtype", "twitter")
                                                                    ]
 
-loginAction : Http.Response String -> Action
-loginAction response =
-  case response of
-    Http.Success str -> loginUser (Json.fromString str)
-    Http.Waiting     -> Working True
-    Http.Failure _ _ -> Working False
+processLoginRepsonse : Http.Response String -> LoginResponse
+processLoginRepsonse res =
+  case res of
+    Http.Success str ->
+      Success (processLoginJson (Json.fromString str))
+    Http.Waiting ->
+      Waiting
+    Http.Failure a b ->
+      Failure a b
 
-loginUser : Maybe Json.Value -> Action
-loginUser userData =
-  case userData of
+processLoginJson : Maybe Json.Value -> Maybe AuthedUser
+processLoginJson json =
+  case json of
     Just (Json.Object userObject) ->
-      case (makeAuthedUser userObject) of
-        Just user -> Step (\state -> { state | working <- False
-                                             , user    <- Just user })
-        Nothing   -> Working False
-    _ -> Working False
+      makeAuthedUser userObject
+    _ ->
+      Nothing
 
 makeAuthedUser : Dict.Dict String Json.Value -> Maybe AuthedUser
 makeAuthedUser userObject =
