@@ -25,4 +25,4 @@ sTitle =
 
 -- Colors
 
-cText = (rgb 42 47 51)
+cText = rgb 42 47 51
