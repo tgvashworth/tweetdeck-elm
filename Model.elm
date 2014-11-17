@@ -57,6 +57,14 @@ type ColumnState =
 
 initialColumnsState = []
 
+makeColumn : [Chirp] -> ColumnState
+makeColumn chirps =
+  { chirps = chirps }
+
+makeChirp : String -> Chirp
+makeChirp content =
+  { content = content }
+
 --- COMPOSE
 
 type ComposeState =

@@ -4,16 +4,12 @@ import Graphics.Input ( Input, input )
 import Graphics.Input.Field as Field
 
 import Model ( .. )
-import Api.Login
 
-inputs : [Signal Action]
-inputs =
-    [ Api.Login.doLogin loginData ]
-    ++
-    map makeStep
-        [ loginUsernameAction <~ loginFormInputs.username.signal
-        , loginPasswordAction <~ loginFormInputs.password.signal
-        ]
+actions : [Signal Action]
+actions =
+  map makeStep
+      [ makeLoginUsernameAction <~ loginFormInputs.username.signal
+      , makeLoginPasswordAction <~ loginFormInputs.password.signal ]
 
 --- Login form
 
@@ -22,6 +18,12 @@ type LoginFormInputs =
   , password : Input Field.Content
   , action   : Input ()
   }
+
+siLoginData : Signal LoginData
+siLoginData =
+  let siUsername  = loginDataSignals.username
+      siPassword  = loginDataSignals.password
+  in (sampleOn loginFormInputs.action.signal ((,) <~ siUsername ~ siPassword))
 
 loginFormInputs : LoginFormInputs
 loginFormInputs =
@@ -35,18 +37,12 @@ loginDataSignals =
   , password = (.string <~ loginFormInputs.password.signal)
   }
 
-loginData : Signal LoginData
-loginData =
-  let siUsername  = loginDataSignals.username
-      siPassword  = loginDataSignals.password
-  in (sampleOn loginFormInputs.action.signal ((,) <~ siUsername ~ siPassword))
-
-loginUsernameAction : Field.Content -> Stepper
-loginUsernameAction content appState =
+makeLoginUsernameAction : Field.Content -> Stepper
+makeLoginUsernameAction content appState =
   let login = appState.login in
   { appState | login <- { login | username <- content } }
 
-loginPasswordAction : Field.Content -> Stepper
-loginPasswordAction content appState =
+makeLoginPasswordAction : Field.Content -> Stepper
+makeLoginPasswordAction content appState =
   let login = appState.login in
   { appState | login <- { login | password <- content } }

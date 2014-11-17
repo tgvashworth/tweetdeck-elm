@@ -1,9 +1,9 @@
 module Actions where
 
 import Model ( .. )
-import Input.Login
+import Data.Login
 
 actions : Signal Action
 actions =
-  merges Input.Login.inputs
+  merges Data.Login.actions
 
