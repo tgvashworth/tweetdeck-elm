@@ -120,5 +120,27 @@ makeInitiaLoadRequest loginResponse =
       Http.get ""
 
 processInitialLoadResponse : Http.Response String -> Maybe Bool
-processInitialLoadResponse processInitialLoadResponse =
-  let _ = Debug.log "processInitialLoadResponse" processInitialLoadResponse in (Just False)
+processInitialLoadResponse res =
+  case res of
+    Http.Success str ->
+      processInitialLoadJson (Json.fromString str)
+    _ ->
+      Just False
+
+processInitialLoadJson : Maybe Json.Value -> Maybe Bool
+processInitialLoadJson json =
+  let
+    _ = Debug.log "json" json
+  in
+    case json of
+      Just (Json.Object initialLoadResponse) ->
+        extractInitialLoadData initialLoadResponse
+      _ ->
+        Just False
+
+extractInitialLoadData : Dict.Dict String Json.Value -> Maybe Bool
+extractInitialLoadData initialLoadResponse =
+  let
+    _ = Debug.log "initialLoadResponse" initialLoadResponse
+  in
+    Just True
