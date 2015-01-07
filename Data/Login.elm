@@ -3,14 +3,17 @@ module Data.Login where
 import Debug
 import Dict
 import Http
-import Json
+import Json.Decode (..)
+import Result
+import Signal (..)
+import Time
 
 import Util.Encode
 
-import Model ( .. )
+import Model (..)
 import Input.Login
 
-data LoginResponse
+type LoginResponse
   = Waiting
   | Failure Int String
   | Success (Maybe AuthedUser)
@@ -27,10 +30,10 @@ sessionHeader {user,session} =
 
 -- Login API Request
 
-actions : [Signal Action]
+actions : List (Signal Action)
 actions =
     [ siLoginAction
-    , delay (1 * millisecond) siInitialLoadAction ]
+    , Time.delay (1 * Time.millisecond) siInitialLoadAction ]
     ++
     Input.Login.actions
 
@@ -76,32 +79,38 @@ makeLoginRequest loginData =
                                                           , ("X-TD-Authtype", "twitter")
                                                           ]
 
+loginResponseDecoder : Decoder (String,String,String)
+loginResponseDecoder =
+  object3 (,,)
+    ("user_id" := string)
+    ("screen_name" := string)
+    ("session" := string)
+
 processLoginRepsonse : Http.Response String -> LoginResponse
 processLoginRepsonse res =
   case res of
     Http.Success str ->
-      Success (processLoginJson (Json.fromString str))
+      Success (processLoginJson str)
     Http.Waiting ->
       Waiting
     Http.Failure a b ->
       Failure a b
 
-processLoginJson : Maybe Json.Value -> Maybe AuthedUser
-processLoginJson json =
-  case json of
-    Just (Json.Object userObject) ->
-      makeAuthedUser userObject
-    _ ->
-      Nothing
-
-makeAuthedUser : Dict.Dict String Json.Value -> Maybe AuthedUser
-makeAuthedUser userObject =
-  case ((,,) (Dict.get "user_id" userObject)
-             (Dict.get "screen_name" userObject)
-             (Dict.get "session" userObject)) of
-    (Just (Json.String id), Just (Json.String screenname), Just (Json.String session)) ->
-      (Just (makeUser id screenname session))
+processLoginJson : String -> Maybe AuthedUser
+processLoginJson str =
+  case (decodeString loginResponseDecoder str) of
+    Ok (id,screenname,session) ->
+      Just (makeUser id screenname session)
     _ -> Nothing
+
+--makeAuthedUser : Dict.Dict String Value -> Maybe AuthedUser
+--makeAuthedUser userObject =
+--  case ((,,) (Dict.get "user_id" userObject)
+--             (Dict.get "screen_name" userObject)
+--             (Dict.get "session" userObject)) of
+--    (Just (String id), Just (String screenname), Just (String session)) ->
+--      (Just (makeUser id screenname session))
+--    _ -> Nothing
 
 -- Initial load
 
@@ -123,24 +132,6 @@ processInitialLoadResponse : Http.Response String -> Maybe Bool
 processInitialLoadResponse res =
   case res of
     Http.Success str ->
-      processInitialLoadJson (Json.fromString str)
+      Just True
     _ ->
       Just False
-
-processInitialLoadJson : Maybe Json.Value -> Maybe Bool
-processInitialLoadJson json =
-  let
-    _ = Debug.log "json" json
-  in
-    case json of
-      Just (Json.Object initialLoadResponse) ->
-        extractInitialLoadData initialLoadResponse
-      _ ->
-        Just False
-
-extractInitialLoadData : Dict.Dict String Json.Value -> Maybe Bool
-extractInitialLoadData initialLoadResponse =
-  let
-    _ = Debug.log "initialLoadResponse" initialLoadResponse
-  in
-    Just True

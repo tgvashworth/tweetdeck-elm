@@ -1,14 +1,15 @@
 module Model where
 
+import Graphics.Element as Element
 import Graphics.Input.Field as Field
-import Graphics.Input as Input
 import Dict
+import Signal (..)
 
 --- STATE
 
-type AppState =
+type alias AppState =
   { user    : Maybe AuthedUser
-  , columns : [ColumnState]
+  , columns : List ColumnState
   , compose : ComposeState
   , login   : LoginState
   , working : Bool
@@ -24,17 +25,17 @@ initialAppState =
 
 --- USER
 
-type UserId     = String
-type ScreenName = String
+type alias UserId     = String
+type alias ScreenName = String
 
-type User =
+type alias User =
   { id        : UserId
   , screename : ScreenName
   }
 
-type Session = String
+type alias Session = String
 
-type AuthedUser =
+type alias AuthedUser =
   { user    : User
   , session : String
   }
@@ -47,17 +48,17 @@ makeUser id screename session =
 
 --- COLUMN
 
-type Chirp =
+type alias Chirp =
   { content : String
   }
 
-type ColumnState =
-  { chirps : [Chirp]
+type alias ColumnState =
+  { chirps : List Chirp
   }
 
 initialColumnsState = []
 
-makeColumn : [Chirp] -> ColumnState
+makeColumn : List Chirp -> ColumnState
 makeColumn chirps =
   { chirps = chirps }
 
@@ -67,7 +68,7 @@ makeChirp content =
 
 --- COMPOSE
 
-type ComposeState =
+type alias ComposeState =
   { text : String
   }
 
@@ -77,7 +78,7 @@ initialComposeState =
 
 --- LOGIN
 
-type LoginState =
+type alias LoginState =
   { username : Field.Content
   , password : Field.Content
   }
@@ -87,30 +88,30 @@ initialLoginState =
   , password = Field.noContent
   }
 
-type LoginData = (String, String)
+type alias LoginData = (String, String)
 
 --- ACTIONS
 
-type Stepper = AppState -> AppState
+type alias Stepper = AppState -> AppState
 
-data Action
+type Action
   = NoOp
   | Working Bool
   | Login
   | Step Stepper
 
-type InputStepper a =
-  { input  : Input.Input a
+type alias InputStepper a =
+  { input  : Channel a
   , action : a -> Stepper
   }
 
 makeStep : Signal Stepper -> Signal Action
-makeStep = lift Step
+makeStep = map Step
 
 --- VIEW
 
-type View = AppState -> (Int,Int) -> Element
+type alias View = AppState -> (Int,Int) -> Element.Element
 
 -- Assets
 
-spinner = image 16 16 "assets/loading-bubbles.svg"
+spinner = Element.image 16 16 "assets/loading-bubbles.svg"

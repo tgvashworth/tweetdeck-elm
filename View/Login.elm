@@ -1,9 +1,12 @@
 module View.Login where
 
-import Graphics.Input (Input, input, button)
+import Graphics.Element (..)
+import Graphics.Input (..)
 import Graphics.Input.Field (..)
 import Text
 import Dict
+import List (..)
+import Signal (..)
 
 import Model
 import Interface as I
@@ -24,8 +27,8 @@ loginForm appState (w,h) =
       <| flow down
       <| intersperse
           (spacer 5 5)
-          [ leftAligned (I.style I.sTitle "Login")
-          , field defaultStyle loginFormInputs.username.handle identity "Phone, email or username" appState.login.username
-          , password defaultStyle loginFormInputs.password.handle identity "Password" appState.login.password
-          , button loginFormInputs.action.handle () "Login"
+          [ Text.leftAligned (I.style I.sTitle "Login")
+          , field defaultStyle (send loginFormInputs.username) "Phone, email or username" appState.login.username
+          , password defaultStyle (send loginFormInputs.password) "Password" appState.login.password
+          , button (send loginFormInputs.action ()) "Login"
           ]

@@ -1,9 +1,10 @@
 module Actions where
 
-import Model ( .. )
+import Model (..)
 import Data.Login
+import Signal
 
 actions : Signal Action
 actions =
-  merges Data.Login.actions
+  Signal.mergeMany Data.Login.actions
 

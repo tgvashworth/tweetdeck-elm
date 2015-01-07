@@ -3,7 +3,7 @@
 An experiment with Elm.
 
 ```bash
-elm -om TweetDeck.elm
+elm-make TweetDeck.elm --output build/TweetDeck.js
 ```
 
 Open `index.html`.

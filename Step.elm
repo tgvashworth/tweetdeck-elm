@@ -3,7 +3,7 @@ module Step (step) where
 import Debug
 import Http
 
-import Model ( AppState, Action ( .. ) )
+import Model ( AppState, Action (..) )
 
 step : Action -> AppState -> AppState
 step action appState =

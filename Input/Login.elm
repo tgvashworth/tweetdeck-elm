@@ -1,40 +1,41 @@
 module Input.Login where
 
-import Graphics.Input ( Input, input )
+import Signal (..)
 import Graphics.Input.Field as Field
+import List
 
-import Model ( .. )
+import Model (..)
 
-actions : [Signal Action]
+actions : List (Signal Action)
 actions =
-  map makeStep
-      [ makeLoginUsernameAction <~ loginFormInputs.username.signal
-      , makeLoginPasswordAction <~ loginFormInputs.password.signal ]
+  List.map makeStep
+      [ makeLoginUsernameAction <~ (subscribe loginFormInputs.username)
+      , makeLoginPasswordAction <~ (subscribe loginFormInputs.password) ]
 
 --- Login form
 
-type LoginFormInputs =
-  { username : Input Field.Content
-  , password : Input Field.Content
-  , action   : Input ()
+type alias LoginFormInputs =
+  { username : Channel Field.Content
+  , password : Channel Field.Content
+  , action   : Channel ()
   }
 
 siLoginData : Signal LoginData
 siLoginData =
   let siUsername  = loginDataSignals.username
       siPassword  = loginDataSignals.password
-  in (sampleOn loginFormInputs.action.signal ((,) <~ siUsername ~ siPassword))
+  in (sampleOn (subscribe loginFormInputs.action) ((,) <~ siUsername ~ siPassword))
 
 loginFormInputs : LoginFormInputs
 loginFormInputs =
-  { username = input Field.noContent
-  , password = input Field.noContent
-  , action   = input ()
+  { username = channel Field.noContent
+  , password = channel Field.noContent
+  , action   = channel ()
   }
 
 loginDataSignals =
-  { username = (.string <~ loginFormInputs.username.signal)
-  , password = (.string <~ loginFormInputs.password.signal)
+  { username = (.string <~ (subscribe loginFormInputs.username))
+  , password = (.string <~ (subscribe loginFormInputs.password))
   }
 
 makeLoginUsernameAction : Field.Content -> Stepper

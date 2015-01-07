@@ -1,12 +1,9 @@
 module Render (render) where
 
 import Debug
-import Html
-import Html (..)
-import Html.Attributes (..)
-import Html.Events (..)
-import Html.Tags (..)
-import Html.Optimize.RefEq as Ref
+import Graphics.Element (..)
+import List
+import Text
 
 import Model
 import Interface as I
@@ -34,12 +31,12 @@ columns : Model.View
 columns appState (w,h) =
   container w h topLeft
       <| flow right
-      <| map (\c -> column c (w,h)) appState.columns
+      <| List.map (\c -> column c (w,h)) appState.columns
 
 column : Model.ColumnState -> (Int, Int) -> Element
 column c (w,h) =
   let _ = Debug.log "column" c in
   container 150 h topLeft
     <| flow down
-    <| [ leftAligned (I.style I.sBase "Column") ]
-    ++ map (leftAligned << I.style I.sBase << .content) c.chirps
+    <| [ Text.leftAligned (I.style I.sBase "Column") ]
+    ++ List.map (Text.leftAligned << I.style I.sBase << .content) c.chirps

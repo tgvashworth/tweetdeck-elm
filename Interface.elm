@@ -1,11 +1,12 @@
 module Interface where
 
 import Text
+import Color
 
 -- Fonts
 
-style : Text.Style -> String -> Text
-style sty str = Text.style sty (Text.toText str)
+style : Text.Style -> String -> Text.Text
+style sty str = Text.style sty (Text.fromString str)
 
 fSizeBase = 16
 
@@ -25,4 +26,4 @@ sTitle =
 
 -- Colors
 
-cText = rgb 42 47 51
+cText = Color.rgb 42 47 51
